@@ -2,7 +2,7 @@
 Documentation   Auto1/QA Task
 Library         SeleniumLibrary
 Library         String
-Library         helpers.HelpLib
+Library         HelpLib.py
 Library         Collections    
 Suite Setup     Open URL Locally
 Suite Teardown  Close Browser
@@ -32,7 +32,8 @@ Open Tests in Souce Labs
 
 Open URL Locally
     #Open Webdriver hosted on Azure Devops
-    Create Webdriver    Chrome    executable_path=D:/a/1/s/node_modules/chromedriver/lib/chromedriver/chromedriver.exe
+    ${chromedriver_path}=   get chromedriver path
+    Create Webdriver    Chrome    executable_path=${chromedriver_path}
     
     # Open Browser on Local Machine
     # Open Browser    https://www.autohero.com/de/search/    chrome
