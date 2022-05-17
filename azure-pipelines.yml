@@ -22,9 +22,15 @@ jobs:
     inputs:
       versionSpec: '$(python.version)'
       architecture: 'x64'
-
-  - script: pip install robotframework robotframework-pabot robotframework-seleniumlibrary webdrivermanager chromedriver && PATH=D:/a/1/s/node_modules/chromedriver/lib/chromedriver;$PATH
+  
+  - script: pip install --upgrade pip
+    displayName: 'Upgrade pip'
+  
+  - script: pip install robotframework robotframework-pabot robotframework-seleniumlibrary webdrivermanager chromedriver
     displayName: 'Install dependencies'
+  
+  - bash: PATH=D:/a/1/s/node_modules/chromedriver/lib/chromedriver:$PATH
+    displayName: 'Add chromedriver to PATH'
   
   - bash: robot --pythonpath . -x outputxunit.xml TestCases.robot
     displayName: 'Run Robot Scripts'
