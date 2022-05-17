@@ -23,7 +23,7 @@ jobs:
       versionSpec: '$(python.version)'
       architecture: 'x64'
 
-  - script: pip install robotframework robotframework-pabot robotframework-seleniumlibrary webdrivermanager
+  - script: pip install robotframework robotframework-pabot robotframework-seleniumlibrary webdrivermanager chromedriver && PATH=D:/a/1/s/node_modules/chromedriver/lib/chromedriver;$PATH
     displayName: 'Install dependencies'
   
   - bash: robot --pythonpath . -x outputxunit.xml TestCases.robot
