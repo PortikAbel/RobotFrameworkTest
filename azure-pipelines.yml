@@ -39,10 +39,10 @@ jobs:
       displayName: 'Publish Test Results outputxunit.xml'
   - task: CopyFiles@2
     inputs:
-      contents: 'D:\a\1\s\**'
-      targetFolder: $(Build.ArtifactStagingDirectory)
+      contents: 'D:\a\1\s\'
+      targetFolder: $(Pipeline.Workspace)
   - task: PublishBuildArtifacts@1
     inputs:
-      pathToPublish: $(Build.ArtifactStagingDirectory)
+      pathToPublish: $(Pipeline.Workspace)
       artifactName: TestOutputs
       publishLocation: 'Container'
