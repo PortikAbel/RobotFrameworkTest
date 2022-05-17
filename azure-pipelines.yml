@@ -10,7 +10,7 @@ jobs:
 
 - job: 'Test'
   pool:
-    vmImage: 'ubuntu-latest'
+    vmImage: 'windows-2019'
   strategy:
     matrix:
       Python37:
@@ -23,10 +23,8 @@ jobs:
       versionSpec: '$(python.version)'
       architecture: 'x64'
 
-  - script: pip install robotframework robotframework-seleniumlibrary & npm install chromedriver
+  - script: pip install robotframework robotframework-pabot robotframework-seleniumlibrary webdrivermanager
     displayName: 'Install dependencies'
-  - script: PATH=/path/to/chromedriver/binary:$PATH
-    displayName: 'Add chromedriver to PATH'
   
   - bash: robot --pythonpath . -x outputxunit.xml TestCases.robot
     displayName: 'Run Robot Scripts'
