@@ -1,115 +1,144 @@
 *** Settings ***
-Documentation   Auto1/QA Task
+Documentation   Robot Framework Demo with Google Maps
 Library         SeleniumLibrary
 Library         String
 Library         HelpLib.py
 Library         Collections    
-Suite Setup     Open URL Locally
-Suite Teardown  Close Browser
+Suite Setup     Nyissa meg a Chrome böngészőt
+Suite Teardown  Zárja be a böngészőt
 
 
 *** Test Cases ***
-TC1 - Check Filters on Advanced Searh Page
-    Given Open URL AutoHero
-    And User is on Advanced Search Page
-    When User Select Filter for First registration
-    And User Select Filter for Price Decsending
-    Then Verify all cars are filtered by First Registration
-    And Verify all Cars are Filtered By Price Descending
 
+TC1 - Útvonal keresés Szováta és Antarktisz között
+    Meg van nyitva a Google Térkép
+    Az útvonal keresésénél vagyok
+    Útvonalat keresek Szováta és Antarktisz között
+    Ezt kell lássam:   Sajnáljuk, nem
+
+TC2 - Útvonal keresés Szováta és Szováta között
+    Meg van nyitva a Google Térkép
+    Az útvonal keresésénél vagyok
+    Útvonalat keresek Szováta és Szováta között
+    Ezt kell lássam:   Sajnáljuk, nem
+
+TC3 - Autós útvonal keresés Szováta és Kolozsvár között
+    Meg van nyitva a Google Térkép
+    Az útvonal keresésénél vagyok
+    Útvonalat keresek Szováta és Kolozsvár között
+    Autós útvonalat keresek
+    Útvonalak hosszai 140 és 190 km köztiek
+
+TC4 - Gyalogos útvonal keresés Kolozsvár és Marosvásárhely között
+    Meg van nyitva a Google Térkép
+    Az útvonal keresésénél vagyok
+    Útvonalat keresek Kolozsvár és Marosvásárhely között
+    Autós útvonalat keresek
+    Útvonalak időtartamai 1 óra 30 perc és 1 óra 55 perc köztiek
+
+TC5 - Élelmiszerboltok keresése értékelés alapján
+    Meg van nyitva a Google Térkép
+    Élelmiszerboltot keresek
+    Szűrés 4.0 értékeléssel
+
+*** Variables ***
+${útvonal gomb}     //*[@id="hArJGc"]
+${kiindulási pont mező}     //input[@placeholder="Válassza ki a kiindulási pontot, vagy kattintson a térképre…"]
+${úticél mező}     //input[@placeholder="Válasszon úti célt, vagy kattintson a térképre…"]
+
+${autó opció gomb}  //img[@data-tooltip="Autó"]
+${gyalogos opció gomb}  //img[@data-tooltip="Gyalog"]
+@{talált útvonalak}     //*[@id="section-directions-trip-0"]    //*[@id="section-directions-trip-1"]    //*[@id="section-directions-trip-2"]
 
 *** Keywords ***
-Open Tests in Souce Labs
-    ${desired_capabilities}=    Create Dictionary
-    Set to Dictionary    ${desired_capabilities}    build    test_run
-    Set to Dictionary    ${desired_capabilities}    platformName    Windows 10
-    Set to Dictionary    ${desired_capabilities}    name    Auto1
-    Set to Dictionary    ${desired_capabilities}    browserName    chrome
 
-    ${executor}=    Evaluate          str('http://milan.novovic:0f772a45-b623-4d44-a01f-9a1db40f0d5d@ondemand.saucelabs.com:80/wd/hub')
-    Create Webdriver    Remote      desired_capabilities=${desired_capabilities}    command_executor=${executor}   
-
-
-Open URL Locally
+Nyissa meg a Chrome böngészőt
     #Open Webdriver hosted on Azure Devops
-    ${chromedriver_path}=   get chromedriver path
-    Create Webdriver    Chrome    executable_path=${chromedriver_path}
+    ${chromedriver_path}    get chromedriver path
+    ${chrome_options} =    Evaluate    selenium.webdriver.ChromeOptions()
+    Call Method    ${chrome_options}    add_argument    --start-maximized
+    Call Method    ${chrome_options}    add_argument    --lang\=hu
+    Call Method    ${chrome_options}    add_argument    --disable-geolocation
+    Create Webdriver    Chrome    executable_path=${chromedriver_path}      chrome_options=${chrome_options}
     
-    # Open Browser on Local Machine
-    # Open Browser    https://www.autohero.com/de/search/    chrome
-    Maximize Browser Window
 
-Open URL AutoHero
-    Go To    https://www.autohero.com/
+Zárja be a böngészőt
+    Close Browser
 
-User is on Advanced Search Page
-    Sleep   5s
-    Click Element                       //button[contains(text(),'Erweiterte Suche')]
-    Wait Until Element Is Visible       //span[contains(text(),'Erstzulassung ab')]
+Meg van nyitva a Google Térkép
+    Go To    https://www.google.com/maps/
 
-User Select Filter for First registration
-    Click Element                        //span[contains(text(),'Erstzulassung ab')]
-    Wait Until Element Is Visible        //select[@name='yearRange.min']/*[text()='2014']   
-    Click Element                        //select[@name='yearRange.min']/*[text()='2014']
-    Sleep   3s
-    Click Element                        //a[contains(text(),'Ergebnisse')]
+Az útvonal keresésénél vagyok
+    Wait Until Element Is Visible   ${útvonal gomb}
+    Click Button    ${útvonal gomb}
 
-Verify all cars are filtered by first registration
+Útvonalat keresek ${indulás} és ${cél} között
+    Wait Until Element Is Visible   ${kiindulási pont mező}
+    Input Text      ${kiindulási pont mező}     ${indulás}
+    Input Text      ${úticél mező}              ${cél}
+    Press Keys      None                        RETURN
 
-#This Keyword  will take all elements with registration, 
-#pass it to python method which will return if there are registration before 2014
- 
-    Sleep   3s
+Ezt kell lássam:
+    [Arguments]     ${üzenet}
+    Wait Until Page Contains    ${üzenet}
 
-    @{locators}    Get Webelements      //*[contains(@class,'specItem___')][1]
-    @{result}=       Create List
-    
-    :FOR   ${locator}   IN    @{locators}
-        \       ${name}=    Get Text    ${locator}
-        \       ${matches}=		Get Regexp Matches      ${name}  	\\d{4}
-        \       Append To List   ${result}    ${matches}
-         ${flat}    Evaluate    [item for sublist in ${result} for item in (sublist if isinstance(sublist, list) else [sublist])]
+Autós útvonalat keresek
+    Wait Until Element Is Visible   ${autó opció gomb}
+    Click Element   ${autó opció gomb}
 
-    ${numbs}=    Convert To Integer   2014
+Gyalogos útvonalat keresek
+    Wait Until Element Is Visible   ${gyalogos opció gomb}
+    Click Element   ${gyalogos opció gomb}
 
-    :FOR   ${locator}   IN    @{flat}
-    \   Log   ${locator}
-    \   Run Keyword Unless  ${locator} >= ${numbs}      Pass   
- 
-User Select Filter for Price Decsending 
-    Wait Until Element Is Visible    //select[contains(@name,'sort')]  
-    Click Element                    //select[contains(@name,'sort')]
-    Sleep   2s
-    Click Element                    //*[text()='Höchster Preis']
+Útvonal hossza
+    [Arguments]  ${útvonal}
+    ${elem}        Get Webelement   ${útvonal}/div[1]/div[1]/div[1]/div[2]/div
+    ${tartalom}    Get Text    ${elem}
+    ${távolság}		Get Regexp Matches      ${tartalom}  	(\\d+) km   1
+    ${távolság}     Convert To Integer      ${távolság}[0]
+    [Return]     ${távolság}
 
-Verify all Cars are Filtered By Price Descending
+Útvonal időtartama
+    [Arguments]  ${útvonal}
+    Wait Until Element Is Visible   ${útvonal}/div[1]/div[1]/div[1]/div[1]/span
+    ${elem}        Get Webelement   ${útvonal}/div[1]/div[1]/div[1]/div[1]/span
+    ${tartalom}    Get Text    ${elem}
+    ${idő}		Get Regexp Matches      ${tartalom}  	(?:(\\d+) óra)? (\\d+) perc     1   2
+    ${óra}     Convert To Integer      ${idő}[0][0]
+    ${perc}     Convert To Integer      ${idő}[0][1]
+    [Return]     ${óra}     ${perc}
 
-#Take all prices, create a list, and return as float so to check if list is sorted
+Útvonalak hosszai ${min} és ${max} km köztiek 
+    FOR   ${div}   IN    @{talált útvonalak}
+        Wait Until Element Is Visible   ${div}
+        ${távolság}     Útvonal hossza  ${div}
 
-    Sleep   2s
-    @{locators}    Get Webelements      //*[contains(@class,'totalPrice')][1]
-    ${priceAll}=       Create List
-    ${sortedList}=       Create List
-    :FOR   ${locator}   IN    @{locators}
-        \       ${name}=    Get Text    ${locator}
-        \       ${matches}=		Get Regexp Matches      ${name}  	\^.....     
-        \       Append To List  ${priceAll}  ${matches}
-        ${flat}    Evaluate    [item for sublist in ${priceAll} for item in (sublist if isinstance(sublist, list) else [sublist])]
+        Should Be True  ${távolság} >= ${min}
+        Should Be True  ${távolság} <= ${max}
 
-    ${sortPrices}=    Sorted List     ${flat}
+    END
 
-    Should Be Equal as Strings     ${sortPrices}   True
+Útvonalak időtartamai ${min óra} óra ${min perc} perc és ${max óra} óra ${max perc} perc köztiek
+    FOR   ${div}   IN    @{talált útvonalak}
+        Wait Until Element Is Visible   ${div}
+        ${óra}     ${perc}  Útvonal időtartama  ${div}
 
-    Log  ${sortPrices}
-    Log  ${flat}   
+        Should Be True  ${óra} > ${min óra} or (${óra} == ${min óra} and ${perc} > ${min perc})
+        Should Be True  ${óra} < ${min óra} or (${óra} == ${min óra} and ${perc} < ${min perc})
+    END
 
+Web elem ${cimke} cimkével
+    Wait Until Element Is Visible   //*[@aria-label=${cimke}]
+    ${web elem}     Get Webelement      //*[@aria-label=${cimke}]
+    [Return]    ${web elem}
 
- 
+Élelmiszerboltot keresek
+    ${élelmiszerboltok gomb}     Web elem "Élelmiszerboltok" cimkével
+    Click Element       ${élelmiszerboltok gomb}
 
-
-
-
-
-
-
-
+Szűrés ${pontszám} értékeléssel
+    ${értékelés gomb}      Web elem "Szűrés Értékelés szerint" cimkével
+    Click Element       ${értékelés gomb}
+    ${értékelés lista elem}     Web elem " ${pontszám} csillag " cimkével
+    Press Keys       ${értékelés lista elem}    RETURN
+    Sleep      5s
