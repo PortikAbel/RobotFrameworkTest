@@ -9,38 +9,47 @@ Suite Teardown  Zárja be a böngészőt
 
 *** Test Cases ***
 
-TC3 - Autós útvonal keresés Szováta és Kolozsvár között
+Kolozsvár leírása
+    Meg van nyitva a Google Térkép
+    Keresés:  Kolozsvár
+    Ezt kell lássam:  ${Kolozsvár leírás}
+
+Autós útvonal keresés Szováta és Kolozsvár között
     Meg van nyitva a Google Térkép
     Az útvonal keresésénél vagyok
     Útvonalat keresek Szováta és Kolozsvár között
     Autós útvonalat keresek
     Útvonalak hosszai 140 és 190 km köztiek
 
-TC4 - Gyalogos útvonal keresés Kolozsvár és Marosvásárhely között
+Gyalogos útvonal keresés Kolozsvár és Marosvásárhely között
     Meg van nyitva a Google Térkép
     Az útvonal keresésénél vagyok
     Útvonalat keresek Kolozsvár és Marosvásárhely között
     Gyalogos útvonalat keresek
-    Útvonalak időtartamai 19 óra 5 perc és 20 óra 5 perc köztiek
+    Útvonalak időtartamai 19 óra 5 perc és 22 óra 15 perc köztiek
 
-TC5 - Élelmiszerboltok keresése értékelés alapján
+Éttermek keresése értékelés alapján
     Meg van nyitva a Google Térkép
-    Élelmiszerboltot keresek
+    Keresés:  Kolozsvár
+    Éttermeket keresek
     Szűrés 4.0 értékeléssel
 
 *** Variables ***
+${kereső mező}      //*[@id="searchboxinput"]
 ${útvonal gomb}     //*[@id="hArJGc"]
 ${kiindulási pont mező}     //input[@placeholder="Válassza ki a kiindulási pontot, vagy kattintson a térképre…" or @aria-label="Kiindulópont Az Ön tartózkodási helye"]
 ${úticél mező}     //input[@placeholder="Válasszon úti célt, vagy kattintson a térképre…"]
 
 ${autó opció gomb}  //img[@data-tooltip="Autó"]
 ${gyalogos opció gomb}  //img[@data-tooltip="Gyalog"]
-@{talált útvonalak}     //*[@id="section-directions-trip-0"]    //*[@id="section-directions-trip-1"]    //*[@id="section-directions-trip-2"]
+@{talált útvonalak}     //*[@id="section-directions-trip-0"]    //*[@id="section-directions-trip-1"]    #    //*[@id="section-directions-trip-2"]
 
 ${útvonal gyalogos ideje}    /div[1]/div[3]/div[1]/div[1]
 ${útvonal autós ideje}    /div[1]/div[1]/div[1]/div[1]/span
 ${útvonal gyalogos hossza}    /div[1]/div[3]/div[1]/div[2]
 ${útvonal autós hossza}    /div[1]/div[1]/div[1]/div[2]/div
+
+${Kolozsvár leírás}     Kolozsvár Románia második legnépesebb városa, Kolozs megye székhelye. Az ország északnyugati részén helyezkedik el, a Kis-Szamos völgyében, nagyjából azonos távolságra Bukaresttől, Budapesttől és Belgrádtól.
 
 *** Keywords ***
 
@@ -130,13 +139,19 @@ Gyalogos útvonalat keresek
         Should Be True  ${óra} < ${max óra} or (${óra} == ${max óra} and ${perc} < ${max perc})
     END
 
+Keresés:
+    [Arguments]     ${cél}
+    Wait Until Element Is Visible   ${kereső mező}
+    Input Text  ${kereső mező}  ${cél}
+    Press Keys  None        RETURN
+
 Web elem ${cimke} cimkével
     Wait Until Element Is Visible   //*[@aria-label=${cimke}]   10s
     ${web elem}     Get Webelement      //*[@aria-label=${cimke}]
     [Return]    ${web elem}
 
-Élelmiszerboltot keresek
-    ${élelmiszerboltok gomb}     Web elem "Élelmiszerboltok" cimkével
+Éttermeket keresek
+    ${élelmiszerboltok gomb}     Web elem "Éttermek" cimkével
     Click Element       ${élelmiszerboltok gomb}
 
 Szűrés ${pontszám} értékeléssel
