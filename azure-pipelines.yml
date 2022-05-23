@@ -23,7 +23,7 @@ jobs:
       versionSpec: '$(python.version)'
       architecture: 'x64'
   
-  - script: pip install --upgrade pip --user
+  - script: python -m pip install --upgrade pip --user
     displayName: 'Upgrade pip'
   
   - script: pip install robotframework robotframework-seleniumlibrary webdriver_manager
@@ -37,12 +37,15 @@ jobs:
       searchFolder: 'D:\a\1\s\'
       condition: succeededOrFailed()
       displayName: 'Publish Test Results outputxunit.xml'
+    condition: always()
   - task: CopyFiles@2
     inputs:
-      contents: 'D:\a\1\s\'
+      contents: 'D:/a/1/s/*.@(xml|html|png)'
       targetFolder: $(Build.ArtifactStagingDirectory)
+    condition: always()
   - task: PublishBuildArtifacts@1
     inputs:
       pathToPublish: $(Build.ArtifactStagingDirectory)
       artifactName: TestOutputs
       publishLocation: 'Container'
+    condition: always()
