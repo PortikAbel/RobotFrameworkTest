@@ -37,3 +37,12 @@ jobs:
       searchFolder: 'D:\a\1\s\'
       condition: succeededOrFailed()
       displayName: 'Publish Test Results outputxunit.xml'
+  - task: CopyFiles@2
+    inputs:
+      contents: 'D:\a\1\s\'
+      targetFolder: $(Build.ArtifactStagingDirectory)
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathToPublish: $(Build.ArtifactStagingDirectory)
+      artifactName: TestOutputs
+      publishLocation: 'Container'
