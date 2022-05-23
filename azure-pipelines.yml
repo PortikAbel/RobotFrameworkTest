@@ -29,7 +29,7 @@ jobs:
   - script: pip install robotframework robotframework-seleniumlibrary webdriver_manager
     displayName: 'Install dependencies'
   
-  - bash: robot --pythonpath . -x outputxunit.xml TestCases.robot
+  - bash: robot --pythonpath . -x outputxunit.xml ./
     displayName: 'Run Robot Scripts'
   - task: PublishTestResults@2
     inputs:

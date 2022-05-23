@@ -10,18 +10,6 @@ Suite Teardown  Zárja be a böngészőt
 
 *** Test Cases ***
 
-TC1 - Útvonal keresés Szováta és Antarktisz között
-    Meg van nyitva a Google Térkép
-    Az útvonal keresésénél vagyok
-    Útvonalat keresek Szováta és Antarktisz között
-    Ezt kell lássam:   Sajnáljuk, nem
-
-TC2 - Útvonal keresés Szováta és Szováta között
-    Meg van nyitva a Google Térkép
-    Az útvonal keresésénél vagyok
-    Útvonalat keresek Szováta és Szováta között
-    Ezt kell lássam:   Sajnáljuk, nem
-
 TC3 - Autós útvonal keresés Szováta és Kolozsvár között
     Meg van nyitva a Google Térkép
     Az útvonal keresésénél vagyok
@@ -43,7 +31,7 @@ TC5 - Élelmiszerboltok keresése értékelés alapján
 
 *** Variables ***
 ${útvonal gomb}     //*[@id="hArJGc"]
-${kiindulási pont mező}     //input[@placeholder="Válassza ki a kiindulási pontot, vagy kattintson a térképre…"]
+${kiindulási pont mező}     //input[@placeholder="Válassza ki a kiindulási pontot, vagy kattintson a térképre…" or @aria-label="Kiindulópont Az Ön tartózkodási helye"]
 ${úticél mező}     //input[@placeholder="Válasszon úti célt, vagy kattintson a térképre…"]
 
 ${autó opció gomb}  //img[@data-tooltip="Autó"]
