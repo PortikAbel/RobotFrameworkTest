@@ -7,7 +7,6 @@ Library         Collections
 Suite Setup     Nyissa meg a Chrome böngészőt
 Suite Teardown  Zárja be a böngészőt
 
-
 *** Test Cases ***
 
 TC3 - Autós útvonal keresés Szováta és Kolozsvár között
@@ -21,8 +20,8 @@ TC4 - Gyalogos útvonal keresés Kolozsvár és Marosvásárhely között
     Meg van nyitva a Google Térkép
     Az útvonal keresésénél vagyok
     Útvonalat keresek Kolozsvár és Marosvásárhely között
-    Autós útvonalat keresek
-    Útvonalak időtartamai 1 óra 30 perc és 1 óra 55 perc köztiek
+    Gyalogos útvonalat keresek
+    Útvonalak időtartamai 19 óra 5 perc és 20 óra 5 perc köztiek
 
 TC5 - Élelmiszerboltok keresése értékelés alapján
     Meg van nyitva a Google Térkép
@@ -37,6 +36,11 @@ ${úticél mező}     //input[@placeholder="Válasszon úti célt, vagy kattints
 ${autó opció gomb}  //img[@data-tooltip="Autó"]
 ${gyalogos opció gomb}  //img[@data-tooltip="Gyalog"]
 @{talált útvonalak}     //*[@id="section-directions-trip-0"]    //*[@id="section-directions-trip-1"]    //*[@id="section-directions-trip-2"]
+
+${útvonal gyalogos ideje}    /div[1]/div[3]/div[1]/div[1]
+${útvonal autós ideje}    /div[1]/div[1]/div[1]/div[1]/span
+${útvonal gyalogos hossza}    /div[1]/div[3]/div[1]/div[2]
+${útvonal autós hossza}    /div[1]/div[1]/div[1]/div[2]/div
 
 *** Keywords ***
 
@@ -79,17 +83,28 @@ Gyalogos útvonalat keresek
     Click Element   ${gyalogos opció gomb}
 
 Útvonal hossza
-    [Arguments]  ${útvonal}
-    ${elem}        Get Webelement   ${útvonal}/div[1]/div[1]/div[1]/div[2]/div
+    [Arguments]  ${útvonal}     ${autós}
+    IF  ${autós}
+        ${elem útvonal}=    Set Variable    ${útvonal}${útvonal autós hossza}
+    ELSE
+        ${elem útvonal}=    Set Variable    ${útvonal}${útvonal gyalogos hossza}
+    END
+    Wait Until Element Is Visible   ${elem útvonal}
+    ${elem}        Get Webelement   ${elem útvonal}
     ${tartalom}    Get Text    ${elem}
     ${távolság}		Get Regexp Matches      ${tartalom}  	(\\d+) km   1
     ${távolság}     Convert To Integer      ${távolság}[0]
     [Return]     ${távolság}
 
 Útvonal időtartama
-    [Arguments]  ${útvonal}
-    Wait Until Element Is Visible   ${útvonal}/div[1]/div[1]/div[1]/div[1]/span
-    ${elem}        Get Webelement   ${útvonal}/div[1]/div[1]/div[1]/div[1]/span
+    [Arguments]  ${útvonal}     ${autós}
+    IF  ${autós}
+        ${elem útvonal}=    Set Variable    ${útvonal}${útvonal autós ideje}
+    ELSE
+        ${elem útvonal}=    Set Variable    ${útvonal}${útvonal gyalogos ideje}
+    END
+    Wait Until Element Is Visible   ${elem útvonal}
+    ${elem}        Get Webelement   ${elem útvonal}
     ${tartalom}    Get Text    ${elem}
     ${idő}		Get Regexp Matches      ${tartalom}  	(?:(\\d+) óra)? (\\d+) perc     1   2
     ${óra}     Convert To Integer      ${idő}[0][0]
@@ -99,7 +114,7 @@ Gyalogos útvonalat keresek
 Útvonalak hosszai ${min} és ${max} km köztiek 
     FOR   ${div}   IN    @{talált útvonalak}
         Wait Until Element Is Visible   ${div}
-        ${távolság}     Útvonal hossza  ${div}
+        ${távolság}     Útvonal hossza  ${div}  ${True}
 
         Should Be True  ${távolság} >= ${min}
         Should Be True  ${távolság} <= ${max}
@@ -109,14 +124,14 @@ Gyalogos útvonalat keresek
 Útvonalak időtartamai ${min óra} óra ${min perc} perc és ${max óra} óra ${max perc} perc köztiek
     FOR   ${div}   IN    @{talált útvonalak}
         Wait Until Element Is Visible   ${div}
-        ${óra}     ${perc}  Útvonal időtartama  ${div}
+        ${óra}     ${perc}  Útvonal időtartama  ${div}  ${False}
 
         Should Be True  ${óra} > ${min óra} or (${óra} == ${min óra} and ${perc} > ${min perc})
-        Should Be True  ${óra} < ${min óra} or (${óra} == ${min óra} and ${perc} < ${min perc})
+        Should Be True  ${óra} < ${max óra} or (${óra} == ${max óra} and ${perc} < ${max perc})
     END
 
 Web elem ${cimke} cimkével
-    Wait Until Element Is Visible   //*[@aria-label=${cimke}]
+    Wait Until Element Is Visible   //*[@aria-label=${cimke}]   10s
     ${web elem}     Get Webelement      //*[@aria-label=${cimke}]
     [Return]    ${web elem}
 
