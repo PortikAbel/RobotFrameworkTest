@@ -23,7 +23,7 @@ jobs:
       versionSpec: '$(python.version)'
       architecture: 'x64'
   
-  - script: pip install --upgrade pip --user
+  - script: python -m pip install --upgrade pip --user
     displayName: 'Upgrade pip'
   
   - script: pip install robotframework robotframework-seleniumlibrary webdriver_manager
